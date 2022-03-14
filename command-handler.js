@@ -4,11 +4,50 @@ const { Modal, TextInputComponent, showModal } = require('discord-modals'); // N
 const { MessageEmbed, WebhookClient } = require('discord.js');
 const Database = require("@replit/database")
 const db = new Database()
-async function promote(client,step1,user,noblox,i,id,rankName) {
+async function promote(userinfo,client,step1,user,noblox,i,id,rankName) {
   let name = await noblox.getUsernameFromId(Number.parseInt(step1))
   await noblox.promote(12944789, id).catch(error => {})
   const rankName2 = await noblox.getRankNameInGroup(12944789, id).catch(error =>  {})
-  await i.reply(`The user has been ranked!!\n${user} | ${rankName} → ${rankName2}`).catch(error => {})
+  const exampleEmbed = new MessageEmbed()
+	  .setColor('#2f3136')
+	  .setTitle(`Player Moderation | Ranking`)
+    .setThumbnail(`https://www.roblox.com/headshot-thumbnail/image?userId=${id}&width=420&height=420&format=png`)
+	  .setURL(`https://www.roblox.com/users/${id}/profile`)
+	  .addFields(
+      { name: 'Ranking Info', value: `${rankName} → ${rankName2}`},
+		  { name: 'Username', value: userinfo.username, inline: true },
+      { name: 'Display Name', value: userinfo.displayName, inline: true },
+      { name: '** **', value: '** **' },
+	  )
+    .addFields(
+      { name: 'Rank', value: rankName2 + ` (Updated)`, inline: true},
+      { name: 'Age', value: userinfo.age.toString(), inline: true }
+    )
+	  .setTimestamp();
+  const row = new MessageActionRow()
+		.addComponents(
+			new MessageButton()
+				.setCustomId('promotebtn')
+				.setLabel('Promote')
+				.setStyle('SUCCESS')
+        .setDisabled(true),
+      new MessageButton()
+				.setCustomId('demotebtn')
+				.setLabel('Demote')
+				.setStyle('DANGER')
+        .setDisabled(true),
+      new MessageButton()
+				.setCustomId('suspendbtn')
+				.setLabel('Suspend')
+			  .setStyle('SECONDARY')
+        .setDisabled(true),
+      new MessageButton()
+		    .setCustomId('unsuspendbtn')
+		    .setLabel('Unsuspend')
+				.setStyle('PRIMARY')
+        .setDisabled(true),
+			  );
+  await i.update({ embeds: [exampleEmbed], components: [row] }).catch(error => {})
   const embed = new MessageEmbed()
 	  .setTitle('Ranking Log')
 	  .setColor('#0099ff')
@@ -17,12 +56,51 @@ Target: ${user} (${id})
 Rank Change: ${rankName} → ${rankName2}`)
   await i.guild.channels.cache.find(i => i.name === '⭐｜rank-logs').send({ embeds: [embed] });
 }
-async function suspend(client,step1,user,noblox,i,id,rankName) {
+async function suspend(userinfo,client,step1,user,noblox,i,id,rankName) {
   let name = await noblox.getUsernameFromId(Number.parseInt(step1))
   db.set(id, rankName)
   await noblox.setRank(12944789, id, '[SUS] Suspended').catch(error => { })
   const rankName2 = await noblox.getRankNameInGroup(12944789, id).catch(error =>  {})
-  await i.reply(`The user has been suspended!!\n${user} | ${rankName} → [SUS] Suspended`).catch(error => {})
+  const exampleEmbed = new MessageEmbed()
+	  .setColor('#2f3136')
+	  .setTitle(`Player Moderation | Ranking`)
+    .setThumbnail(`https://www.roblox.com/headshot-thumbnail/image?userId=${id}&width=420&height=420&format=png`)
+	  .setURL(`https://www.roblox.com/users/${id}/profile`)
+	  .addFields(
+      { name: 'Ranking Info', value: `${rankName} → [SUS] Suspended`},
+		  { name: 'Username', value: userinfo.username, inline: true },
+      { name: 'Display Name', value: userinfo.displayName, inline: true },
+      { name: '** **', value: '** **' },
+	  )
+    .addFields(
+      { name: 'Rank', value: rankName2 + ` (Updated)`, inline: true},
+      { name: 'Age', value: userinfo.age.toString(), inline: true }
+    )
+	  .setTimestamp();
+  const row = new MessageActionRow()
+		.addComponents(
+			new MessageButton()
+				.setCustomId('promotebtn')
+				.setLabel('Promote')
+				.setStyle('SUCCESS')
+        .setDisabled(true),
+      new MessageButton()
+				.setCustomId('demotebtn')
+				.setLabel('Demote')
+				.setStyle('DANGER')
+        .setDisabled(true),
+      new MessageButton()
+				.setCustomId('suspendbtn')
+				.setLabel('Suspend')
+			  .setStyle('SECONDARY')
+        .setDisabled(true),
+      new MessageButton()
+		    .setCustomId('unsuspendbtn')
+		    .setLabel('Unsuspend')
+				.setStyle('PRIMARY')
+        .setDisabled(true),
+			  );
+  await i.update({ embeds: [exampleEmbed], components: [row] }).catch(error => {})
   const embed = new MessageEmbed()
 	  .setTitle('Ranking Log')
 	  .setColor('#0099ff')
@@ -31,13 +109,52 @@ Target: ${user} (${id})
 Rank Change: ${rankName} → [SUS] Suspended`)
   await i.guild.channels.cache.find(i => i.name === '⭐｜rank-logs').send({ embeds: [embed] });
 }
-async function unsuspend(client,step1,user,noblox,i,id,rankName) {
+async function unsuspend(userinfo,client,step1,user,noblox,i,id,rankName) {
   let name = await noblox.getUsernameFromId(Number.parseInt(step1))
   let rank = await db.get(id, rankName)
   await noblox.setRank(12944789, id, rank).catch(error => {})
   const rankName2 = await noblox.getRankNameInGroup(12944789, id).catch(error =>  {})
-  await i.reply(`The user has been unsuspended!!\n${user} | [SUS] Suspended → ${rankName2}`).catch(error => {})
   db.delete(id)
+  const exampleEmbed = new MessageEmbed()
+	  .setColor('#2f3136')
+	  .setTitle(`Player Moderation | Ranking`)
+    .setThumbnail(`https://www.roblox.com/headshot-thumbnail/image?userId=${id}&width=420&height=420&format=png`)
+	  .setURL(`https://www.roblox.com/users/${id}/profile`)
+	  .addFields(
+      { name: 'Ranking Info', value: `[SUS] Suspended → ${rankName2}`},
+		  { name: 'Username', value: userinfo.username, inline: true },
+      { name: 'Display Name', value: userinfo.displayName, inline: true },
+      { name: '** **', value: '** **' },
+	  )
+    .addFields(
+      { name: 'Rank', value: rankName2 + ` (Updated)`, inline: true},
+      { name: 'Age', value: userinfo.age.toString(), inline: true }
+    )
+	  .setTimestamp();
+  const row = new MessageActionRow()
+		.addComponents(
+			new MessageButton()
+				.setCustomId('promotebtn')
+				.setLabel('Promote')
+				.setStyle('SUCCESS')
+        .setDisabled(true),
+      new MessageButton()
+				.setCustomId('demotebtn')
+				.setLabel('Demote')
+				.setStyle('DANGER')
+        .setDisabled(true),
+      new MessageButton()
+				.setCustomId('suspendbtn')
+				.setLabel('Suspend')
+			  .setStyle('SECONDARY')
+        .setDisabled(true),
+      new MessageButton()
+		    .setCustomId('unsuspendbtn')
+		    .setLabel('Unsuspend')
+				.setStyle('PRIMARY')
+        .setDisabled(true),
+			  );
+  await i.update({ embeds: [exampleEmbed], components: [row] }).catch(error => {})
   const embed = new MessageEmbed()
 	  .setTitle('Ranking Log')
 	  .setColor('#0099ff')
@@ -46,11 +163,50 @@ Target: ${user} (${id})
 Rank Change: [SUS] Suspended → ${rankName2}`)
   await i.guild.channels.cache.find(i => i.name === '⭐｜rank-logs').send({ embeds: [embed] });
 }
-async function demote(client,step1,user,noblox,i,id,rankName) {
+async function demote(userinfo,client,step1,user,noblox,i,id,rankName) {
   let name = await noblox.getUsernameFromId(Number.parseInt(step1))
   await noblox.demote(12944789, id).catch(error => {})
   const rankName2 = await noblox.getRankNameInGroup(12944789, id).catch(error =>  {})
-  await i.reply(`The user has been ranked!!\n${user} | ${rankName2} ← ${rankName}`).catch(error => {})
+  const exampleEmbed = new MessageEmbed()
+	  .setColor('#2f3136')
+	  .setTitle(`Player Moderation | Ranking`)
+    .setThumbnail(`https://www.roblox.com/headshot-thumbnail/image?userId=${id}&width=420&height=420&format=png`)
+	  .setURL(`https://www.roblox.com/users/${id}/profile`)
+	  .addFields(
+      { name: 'Ranking Info', value: `${rankName2} ← ${rankName}`  },
+		  { name: 'Username', value: userinfo.username, inline: true },
+      { name: 'Display Name', value: userinfo.displayName, inline: true },
+      { name: '** **', value: '** **' },
+	  )
+    .addFields(
+      { name: 'Rank', value: rankName2 + ` (Updated)`, inline: true},
+      { name: 'Age', value: userinfo.age.toString(), inline: true }
+    )
+	  .setTimestamp();
+  const row = new MessageActionRow()
+		.addComponents(
+			new MessageButton()
+				.setCustomId('promotebtn')
+				.setLabel('Promote')
+				.setStyle('SUCCESS')
+        .setDisabled(true),
+      new MessageButton()
+				.setCustomId('demotebtn')
+				.setLabel('Demote')
+				.setStyle('DANGER')
+        .setDisabled(true),
+      new MessageButton()
+				.setCustomId('suspendbtn')
+				.setLabel('Suspend')
+			  .setStyle('SECONDARY')
+        .setDisabled(true),
+      new MessageButton()
+		    .setCustomId('unsuspendbtn')
+		    .setLabel('Unsuspend')
+				.setStyle('PRIMARY')
+        .setDisabled(true),
+			  );
+  await i.update({ embeds: [exampleEmbed], components: [row] }).catch(error => {})
   const embed = new MessageEmbed()
 	  .setTitle('Ranking Log')
 	  .setColor('#0099ff')
@@ -163,7 +319,7 @@ module.exports = (client, noblox) => {
             new MessageButton()
 					    .setCustomId('suspendbtn')
 					    .setLabel('Suspend')
-					    .setStyle('PRIMARY'),
+					    .setStyle('SECONDARY'),
             new MessageButton()
 					    .setCustomId('unsuspendbtn')
 					    .setLabel('Unsuspend')
@@ -176,24 +332,24 @@ module.exports = (client, noblox) => {
 
         collector.on('collect', async i => {
 	        if (i.customId === 'promotebtn') {
-		        if (rankId === rankId2) return i.reply({ content: 'You cant moderate a rank the same as yours.', ephemeral: true })
-            if (rankId < rankId2) return i.reply({ content: 'You cant moderate a rank higher then yours.', ephemeral: true })
-            await noblox.setCookie(process.env.COOKIE).then(promote(client,step1,user,noblox,i,id,rankName))
+		        if (rankId === rankId2) return i.reply({ content: 'You cant moderate a rank the same as yours.', ephemeral: true }).catch(error => {})
+            if (rankId < rankId2) return i.reply({ content: 'You cant moderate a rank higher then yours.', ephemeral: true }).catch(error => {})
+            await noblox.setCookie(process.env.COOKIE).then(promote(userinfo,client,step1,user,noblox,i,id,rankName))
 	        }
           if (i.customId === 'demotebtn') {
-		        if (rankId === rankId2) return i.reply({ content: 'You cant moderate a rank the same as yours.', ephemeral: true })
-            if (rankId < rankId2) return i.reply({ content: 'You cant moderate a rank higher then yours.', ephemeral: true })
-            await noblox.setCookie(process.env.COOKIE).then(demote(client,step1,user,noblox,i,id,rankName))
+		        if (rankId === rankId2) return i.reply({ content: 'You cant moderate a rank the same as yours.', ephemeral: true }).catch(error => {})
+            if (rankId < rankId2) return i.reply({ content: 'You cant moderate a rank higher then yours.', ephemeral: true }).catch(error => {})
+            await noblox.setCookie(process.env.COOKIE).then(demote(userinfo,client,step1,user,noblox,i,id,rankName))
 	        }
           if (i.customId === 'suspendbtn') {
-		        if (rankId === rankId2) return i.reply({ content: 'You cant moderate a rank the same as yours.', ephemeral: true })
-            if (rankId < rankId2) return i.reply({ content: 'You cant moderate a rank higher then yours.', ephemeral: true })
-            await noblox.setCookie(process.env.COOKIE).then(suspend(client,step1,user,noblox,i,id,rankName))
+		        if (rankId === rankId2) return i.reply({ content: 'You cant moderate a rank the same as yours.', ephemeral: true }).catch(error => {})
+            if (rankId < rankId2) return i.reply({ content: 'You cant moderate a rank higher then yours.', ephemeral: true }).catch(error => {})
+            await noblox.setCookie(process.env.COOKIE).then(suspend(userinfo,client,step1,user,noblox,i,id,rankName))
 	        }
           if (i.customId === 'unsuspendbtn') {
-		        if (rankId === rankId2) return i.reply({ content: 'You cant moderate a rank the same as yours.', ephemeral: true })
-            if (rankId < rankId2) return i.reply({ content: 'You cant moderate a rank higher then yours.', ephemeral: true })
-            await noblox.setCookie(process.env.COOKIE).then(unsuspend(client,step1,user,noblox,i,id,rankName))
+		        if (rankId === rankId2) return i.reply({ content: 'You cant moderate a rank the same as yours.', ephemeral: true }).catch(error => {})
+            if (rankId < rankId2) return i.reply({ content: 'You cant moderate a rank higher then yours.', ephemeral: true }).catch(error => {})
+            await noblox.setCookie(process.env.COOKIE).then(unsuspend(userinfo,client,step1,user,noblox,i,id,rankName))
 	        }
         });
 
