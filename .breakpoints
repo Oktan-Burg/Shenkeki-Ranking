@@ -3,9 +3,17 @@
     "command-handler.js": [
       {
         "id": "80fdd3c9-c607-4f8b-a8c3-1bdebaf7f4dd",
-        "line": 17,
-        "version": 1294,
-        "index": 589
+        "line": 3,
+        "version": 10443,
+        "index": 101
+      }
+    ],
+    "index.js": [
+      {
+        "id": "6ddd94c4-f0bd-41dc-94e6-e088b7bb67b1",
+        "line": 54,
+        "version": 507,
+        "index": 1762
       }
     ]
   }
